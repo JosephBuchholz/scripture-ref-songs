@@ -1,8 +1,11 @@
 import { useParams } from "react-router-dom";
 import Header from "../components/Header";
+import { useState } from "react";
 
 export default function ViewSongPage() {
     const { id } = useParams();
+
+    const [currentRefId, setCurrentRefId] = useState(-1);
 
     let songString = "";
     if (id == 0) {
@@ -33,6 +36,16 @@ Blessings all mine with ten thousand beside!`;
 
     const linesArray = songString.split("\n");
 
+    /**
+     * The first element is the type:
+     *  "l" = line: the second elment will then be the line number
+     *  "lr" = line range: the second element will be the line range
+     *
+     * The second element is a number or range: so for example: 7 or [0, 5]
+     *
+     * The thrid element (which is optional) is the particular verse(s)
+     */
+
     let references = [
         [
             "Lam. 3:21-24",
@@ -46,17 +59,50 @@ Blessings all mine with ten thousand beside!`;
                 ["lr", [14, 15], 24],
             ],
         ],
+        [
+            "Ps. 36:5",
+            [
+                ["l", 0],
+                ["lr", [4, 5]],
+                ["l", 8],
+                ["l", 12],
+            ],
+        ],
+        [
+            "James 1:17",
+            [
+                ["lr", [1, 3]],
+                ["lr", [6, 7]],
+                ["l", 16],
+            ],
+        ],
+        ["Ps. 89:5", [["lr", [9, 12]]]],
+        ["Ps. 29:11", [["lr", [13, 16]]]],
     ];
 
     let mainReferencesDisplay = [];
 
+    let index = 0;
     for (let ref of references) {
-        mainReferencesDisplay.push(<p>{ref[0]}</p>);
+        mainReferencesDisplay.push(
+            <ScriptRef
+                onHover={(event, id) => {
+                    if (event === 0) {
+                        setCurrentRefId(id);
+                    }
+                }}
+                id={index}
+            >
+                {ref[0]}
+            </ScriptRef>
+        );
+        index++;
     }
 
     let lyricsDisplay = [];
 
-    let spans = references[0][1];
+    let spans = [];
+    if (currentRefId !== -1) spans = references[currentRefId][1];
 
     let lineNumber = -1;
     for (let i = 0; i < linesArray.length; i++) {
@@ -104,7 +150,7 @@ Blessings all mine with ten thousand beside!`;
                 <Header></Header>
 
                 <div className="flex-1 flex flex-col justify-center items-center">
-                    {mainReferencesDisplay}
+                    <div className="flex flex-row">{mainReferencesDisplay}</div>
                     <div className="flex flex-col">{lyricsDisplay}</div>
                 </div>
             </div>
@@ -129,5 +175,21 @@ function HighlightSpan({ children }) {
         <span className="bg-blue-100 text-blue-700 shadow-md shadow-gray-300">
             {children}
         </span>
+    );
+}
+
+function ScriptRef({ children, onHover, id }) {
+    return (
+        <p
+            onMouseEnter={() => {
+                onHover(0, id);
+            }}
+            onMouseLeave={() => {
+                onHover(1, id);
+            }}
+            className="m-1 font-semibold"
+        >
+            {children}
+        </p>
     );
 }

@@ -17,5 +17,35 @@
         <div id="app"></div>
 
         <script type="module" src="{% static "frontend/main.js" %}"></script>
+
+        <script>
+            var refTagger = {
+                settings: {
+                    bibleReader: "bible.faithlife",
+                    bibleVersion: "ESV",			
+                    roundCorners: true,
+                    socialSharing: ["google"],
+                    customStyle : {
+                        heading: {
+                            backgroundColor : "#F5F5F5",
+                            color : "#000000"
+                        },
+                        body   : {
+                            color : "#000000",
+                            fontSize : "14px"
+                        }
+                    }
+                }
+            }; 
+
+            (function(d, t) {
+                var n = d.querySelector('[nonce]');
+                refTagger.settings.nonce = n && (n.nonce || n.getAttribute('nonce'));
+                var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
+                g.src = 'https://api.reftagger.com/v2/RefTagger.js';
+                g.nonce = refTagger.settings.nonce;
+                s.parentNode.insertBefore(g, s);
+            }(document, 'script'));
+        </script>
     </body>
 </html>
