@@ -6,6 +6,7 @@ export default function ViewSongPage() {
     const { id } = useParams();
 
     const [currentRefId, setCurrentRefId] = useState(-1);
+    const [selectedLineNumber, setSelectedLineNumber] = useState(-1);
 
     let songString = "";
     if (id == 0) {
@@ -80,6 +81,51 @@ Blessings all mine with ten thousand beside!`;
         ["Ps. 29:11", [["lr", [13, 16]]]],
     ];
 
+    let referencesByLine = [
+        [],
+        [
+            "James 1:17",
+            "Mal. 3:6",
+            "Ps. 102:27",
+            "Num. 23:19",
+            "Isa. 41:4",
+            "Isa. 48:12",
+            "Heb. 13:8",
+        ],
+        [],
+        [],
+
+        ["Lam. 3:23"],
+        [],
+        ["Lam. 3:22-23"],
+        [],
+        [],
+
+        [
+            "Ps. 19:1",
+            "Ps. 89:5",
+            "Rom. 1:19-20",
+            "[Ps. 50:6]",
+            "[Ps. 7:6]",
+            "[Gen. 8:22]",
+        ],
+        [],
+        [],
+        [],
+
+        [
+            "Lam. 3:21,24",
+            "Ps. 29:11",
+            "Ps. 73:23-26",
+            "Acts 3:19-20",
+            "Col. 2:13-14",
+            "Phil. 4:7",
+        ],
+        ["Ps. 94:18-19", "Ps. 73:23-26", "Ps. 25:8-10"],
+        ["Ps. 29:11", "Ps. 65:35"],
+        [],
+    ];
+
     let mainReferencesDisplay = [];
 
     let index = 0;
@@ -112,9 +158,15 @@ Blessings all mine with ten thousand beside!`;
             lineNumber++;
         } else {
             if (line === "") {
-                lyricsDisplay.push(<br></br>);
+                lyricsDisplay.push(
+                    <p>
+                        <br />
+                    </p>
+                );
             } else if (line === "Refrain:") {
-                lyricsDisplay.push(<LyricLine>{line}</LyricLine>);
+                lyricsDisplay.push(
+                    <LyricLine nonLyric={true}>{line}</LyricLine>
+                );
             }
 
             continue;
@@ -141,7 +193,35 @@ Blessings all mine with ten thousand beside!`;
             s.push(0);
         }
 
-        lyricsDisplay.push(<LyricLine spans={s}>{line}</LyricLine>);
+        lyricsDisplay.push(
+            <LyricLine
+                lineNumber={lineNumber}
+                isHighlighted={selectedLineNumber == lineNumber}
+                spans={s}
+                onClick={(lineNum) => {
+                    setSelectedLineNumber(lineNum);
+                }}
+            >
+                {line}
+            </LyricLine>
+        );
+    }
+
+    let versesByLine = <></>;
+    if (selectedLineNumber !== -1) {
+        let otherReferencesDisplay = [];
+
+        let index = 0;
+        for (let ref of referencesByLine[selectedLineNumber]) {
+            otherReferencesDisplay.push(
+                <ScriptRef onHover={(event, id) => {}} id={index}>
+                    {ref}
+                </ScriptRef>
+            );
+            index++;
+        }
+
+        versesByLine = <>{otherReferencesDisplay}</>;
     }
 
     return (
@@ -150,32 +230,79 @@ Blessings all mine with ten thousand beside!`;
                 <Header></Header>
 
                 <div className="flex-1 flex flex-col justify-center items-center">
-                    <div className="flex flex-row">{mainReferencesDisplay}</div>
-                    <div className="flex flex-col">{lyricsDisplay}</div>
+                    <div className="w-10/12 flex flex-row">
+                        <div className="w-1/2">
+                            <div className="flex flex-row pb-5">
+                                {mainReferencesDisplay}
+                            </div>
+                            <div className="flex flex-col">{lyricsDisplay}</div>
+                        </div>
+                        <div className="w-1/2 border-l-2 ml-4 pl-4">
+                            <div className="flex flex-wrap">{versesByLine}</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </>
     );
 }
 
-function LyricLine({ children, spans = [] }) {
+function LyricLine({
+    children,
+    lineNumber = -1,
+    isHighlighted = false,
+    spans = [],
+    nonLyric = false,
+    onClick = () => {},
+}) {
+    const [lineIsHighlighted, setLineIsHighlighted] = useState(false);
+
     const words = children.split();
 
     let newChildren = <>{children}</>;
 
-    if (spans[0] === 0) {
-        newChildren = <HighlightSpan>{children}</HighlightSpan>;
+    let className = "flex flex-row ";
+
+    if (!nonLyric) {
+        if (spans[0] === 0) {
+            newChildren = (
+                <HighlightSpan
+                    lineIsHighlighted={lineIsHighlighted || isHighlighted}
+                >
+                    {children}
+                </HighlightSpan>
+            );
+        }
+
+        if (lineIsHighlighted || isHighlighted) {
+            className += "bg-yellow-200";
+        }
     }
 
-    return <div className="flex flex-row">{newChildren}</div>;
+    return (
+        <div
+            className={className}
+            onMouseEnter={() => {
+                setLineIsHighlighted(true);
+            }}
+            onMouseLeave={() => {
+                setLineIsHighlighted(false);
+            }}
+            onClick={(e) => {
+                if (!nonLyric) onClick(lineNumber);
+            }}
+        >
+            {newChildren}
+        </div>
+    );
 }
 
-function HighlightSpan({ children }) {
-    return (
-        <span className="bg-blue-100 text-blue-700 shadow-md shadow-gray-300">
-            {children}
-        </span>
-    );
+function HighlightSpan({ children, lineIsHighlighted = false }) {
+    let className = "bg-blue-100 text-blue-700 shadow-md shadow-gray-300";
+    if (lineIsHighlighted)
+        className = "bg-yellow-300 text-yellow-950 shadow-md shadow-gray-300";
+
+    return <span className={className}>{children}</span>;
 }
 
 function ScriptRef({ children, onHover, id }) {
@@ -187,7 +314,7 @@ function ScriptRef({ children, onHover, id }) {
             onMouseLeave={() => {
                 onHover(1, id);
             }}
-            className="m-1 font-semibold"
+            className="mx-1 font-semibold hover:text-blue-500"
         >
             {children}
         </p>
