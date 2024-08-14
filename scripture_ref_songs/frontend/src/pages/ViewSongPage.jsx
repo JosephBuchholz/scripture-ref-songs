@@ -1,12 +1,28 @@
 import { useParams } from "react-router-dom";
 import Header from "../components/Header";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function ViewSongPage() {
     const { id } = useParams();
 
     const [currentRefId, setCurrentRefId] = useState(-1);
     const [selectedLineNumber, setSelectedLineNumber] = useState(-1);
+    const [selectedPassage, setSelectedPassage] = useState({
+        book: 1,
+        chapter: 1,
+        verse: 1,
+    });
+    const [bibleText, setBibleText] = useState("");
+
+    // gets selected bible passage from backend
+    fetch(
+        `/bible/getverse?b=${selectedPassage.book}&c=${selectedPassage.chapter}&v=${selectedPassage.verse}`
+    ).then((response) => {
+        response.text().then((text) => {
+            console.log(text);
+            setBibleText(text);
+        });
+    });
 
     let songString = "";
     if (id == 0) {
@@ -132,6 +148,11 @@ Blessings all mine with ten thousand beside!`;
     for (let ref of references) {
         mainReferencesDisplay.push(
             <ScriptRef
+                onClick={(ref) => {
+                    let numRef = stringRefToNumRef(ref);
+                    console.log(numRef);
+                    setSelectedPassage(numRef);
+                }}
                 onHover={(event, id) => {
                     if (event === 0) {
                         setCurrentRefId(id);
@@ -214,7 +235,15 @@ Blessings all mine with ten thousand beside!`;
         let index = 0;
         for (let ref of referencesByLine[selectedLineNumber]) {
             otherReferencesDisplay.push(
-                <ScriptRef onHover={(event, id) => {}} id={index}>
+                <ScriptRef
+                    onClick={(ref) => {
+                        let numRef = stringRefToNumRef(ref);
+                        console.log(numRef);
+                        setSelectedPassage(numRef);
+                    }}
+                    onHover={(event, id) => {}}
+                    id={index}
+                >
                     {ref}
                 </ScriptRef>
             );
@@ -238,7 +267,10 @@ Blessings all mine with ten thousand beside!`;
                             <div className="flex flex-col">{lyricsDisplay}</div>
                         </div>
                         <div className="w-1/2 border-l-2 ml-4 pl-4">
-                            <div className="flex flex-wrap">{versesByLine}</div>
+                            <div className="flex flex-wrap pb-5">
+                                {versesByLine}
+                            </div>
+                            <div className="flex flex-col">{bibleText}</div>
                         </div>
                     </div>
                 </div>
@@ -305,9 +337,12 @@ function HighlightSpan({ children, lineIsHighlighted = false }) {
     return <span className={className}>{children}</span>;
 }
 
-function ScriptRef({ children, onHover, id }) {
+function ScriptRef({ children, onClick, onHover, id }) {
     return (
         <p
+            onClick={() => {
+                onClick(children);
+            }}
             onMouseEnter={() => {
                 onHover(0, id);
             }}
@@ -319,4 +354,95 @@ function ScriptRef({ children, onHover, id }) {
             {children}
         </p>
     );
+}
+
+const bookLookup = {
+    Genesis: 1,
+    "Gen.": 1,
+    "Ex.": 2,
+    "Lev.": 3,
+    "Num.": 4,
+    "Deut.": 5,
+    "Josh.": 6,
+    Judges: 7,
+    "Judg.": 7,
+    Ruth: 8,
+    "1 Sam.": 9,
+    "2 Sam.": 10,
+    "1 Kings": 11,
+    "2 Kings": 12,
+    "1 Chr.": 13,
+    "2 Chr.": 14,
+    Ezra: 15,
+    "Neh.": 16,
+    Esther: 17,
+    Job: 18,
+    "Ps.": 19,
+    "Pro.": 20,
+    "Ecc.": 21,
+    Song: 22,
+    "Isa.": 23,
+    "Jer.": 24,
+    "Lam.": 25,
+    "Ezek.": 26,
+    "Dan.": 27,
+    Hosea: 28,
+    Joel: 29,
+    Amos: 30,
+    Obadiah: 31,
+    Jonah: 32,
+    "Mic.": 33,
+    Nahum: 34,
+    "Hab.": 35,
+    "Zeph.": 36,
+    "Hag.": 37,
+    "Zech.": 38,
+    "Mal.": 39,
+    "Matt.": 40,
+    Mark: 41,
+    Luke: 42,
+    John: 43,
+    Acts: 44,
+    "Rom.": 45,
+    "1 Cor.": 46,
+    "2 Cor.": 47,
+    "Gal.": 48,
+    "Eph.": 49,
+    Philippians: 50,
+    "Phil.": 50,
+    "Col.": 51,
+    "1 Thes.": 52,
+    "2 Thes.": 53,
+    "1 Tim.": 54,
+    "2 Tim.": 55,
+    Titus: 56,
+    Philemon: 57,
+    Hebrews: 58,
+    "Heb.": 58,
+    James: 59,
+    "Jam.": 59,
+    "1 Pet.": 60,
+    "2 Pet.": 61,
+    "1 John": 62,
+    "2 John": 63,
+    "3 John": 64,
+    Jude: 65,
+    "Rev.": 66,
+};
+
+// TODO: will need updated
+function stringRefToNumRef(stringRef) {
+    let numRef = { book: 1, chapter: 1, verse: 1 };
+    let parts = stringRef.split(" ");
+
+    numRef.book = bookLookup[parts[0]];
+
+    let p = parts[1].split(":");
+    let o = p[1].split("-");
+    let chapter = p[0];
+    let verse = o[0];
+    numRef.chapter = chapter;
+    numRef.verse = verse;
+
+    return numRef;
 }
