@@ -1,5 +1,8 @@
 import Header from "../components/Header";
 
+/**
+ * Basic home page.
+ */
 export default function HomePage() {
     return (
         <>

@@ -1,5 +1,8 @@
 import { Link } from "react-router-dom";
 
+/**
+ * A basic resuable header.
+ */
 export default function Header() {
     return <NavigationBar></NavigationBar>;
 }
