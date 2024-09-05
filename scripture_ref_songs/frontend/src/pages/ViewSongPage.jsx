@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import Header from "../components/Header";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { bookLookup } from "../data";
 
 export default function ViewSongPage() {
@@ -10,6 +10,15 @@ export default function ViewSongPage() {
     const [selectedLineNumber, setSelectedLineNumber] = useState(-1);
     const [selectedPassage, setSelectedPassage] = useState(null);
     const [bibleText, setBibleText] = useState("");
+    const [songData, setSongData] = useState(null);
+
+    useEffect(() => {
+        fetch(`/songs/getfile?id=${id}`).then((response) => {
+            response.text().then((text) => {
+                setSongData(JSON.parse(text));
+            });
+        });
+    }, []);
 
     // get selected Bible passage from backend
     if (selectedPassage !== null) {
@@ -19,7 +28,6 @@ export default function ViewSongPage() {
                 `/bible/getverse?b=${selectedPassage.book}&c=${selectedPassage.chapter}&v=${verse}`
             ).then((response) => {
                 response.text().then((text) => {
-                    console.log(text);
                     setBibleText(text);
                 });
             });
@@ -30,41 +38,18 @@ export default function ViewSongPage() {
                 `/bible/getverserange?b=${selectedPassage.book}&c=${selectedPassage.chapter}&v1=${verse1}&v2=${verse2}`
             ).then((response) => {
                 response.text().then((text) => {
-                    console.log(text);
                     setBibleText(text);
                 });
             });
         }
     }
 
-    let songString = "";
-    if (id == 0) {
-        songString = `Great is Thy faithfulness, O God my Father
-There is no shadow of turning with Thee
-Thou changest not, Thy compassions, they fail not
-As Thou hast been, Thou forever wilt be
-
-Refrain:
-Great is Thy faithfulness!
-Great is Thy faithfulness!
-Morning by morning new mercies I see
-All I have needed Thy hand hath provided:
-Great is Thy faithfulness, Lord, unto me!
-
-Summer and winter, and springtime and harvest
-Sun, moon, and stars in their courses above
-Join with all nature in manifold witness
-To Thy great faithfulness, mercy, and love.
-
-Pardon for sin and a peace that endureth
-Thine own dear presence to cheer and to guide
-Strength for today and bright hope for tomorrow:
-Blessings all mine with ten thousand beside!`;
+    let linesArray = [];
+    if (songData) {
+        linesArray = songData.lyrics;
     } else {
-        songString = "nothing";
+        linesArray = ["none"];
     }
-
-    const linesArray = songString.split("\n");
 
     /**
      * The first element is the type:
@@ -299,7 +284,7 @@ function LyricLine({
 
     let newChildren = <>{children}</>;
 
-    let className = "flex flex-row ";
+    let className = "flex flex-row";
 
     if (!nonLyric) {
         if (spans[0] === 0) {
@@ -313,8 +298,10 @@ function LyricLine({
         }
 
         if (lineIsHighlighted || isHighlighted) {
-            className += "bg-yellow-200";
+            className += " bg-yellow-200";
         }
+
+        className += " cursor-pointer";
     }
 
     return (
@@ -355,7 +342,7 @@ function ScriptRef({ children, onClick, onHover, id }) {
             onMouseLeave={() => {
                 onHover(1, id);
             }}
-            className="mx-1 font-semibold hover:text-blue-500"
+            className="mx-1 font-semibold hover:text-blue-500 cursor-pointer"
         >
             {children}
         </p>
