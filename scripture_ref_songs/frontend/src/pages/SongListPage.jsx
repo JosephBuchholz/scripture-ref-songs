@@ -44,13 +44,25 @@ export default function SongListPage() {
 }
 
 function SongListItem({ title, creators, onClick = () => {} }) {
+    // split by ',' and ':'; then get only the odd indexs (thus only getting the names and not their roles)
+    let newCreators = creators.split(/:|,/).filter((_, index) => {
+        return index % 2 != 0; // is odd
+    });
+
+    // add commas for seperators
+    newCreators.forEach((_, index, array) => {
+        if (index != newCreators.length - 1) {
+            array[index] += ", ";
+        }
+    });
+
     return (
         <div
             className="m-2 p-4 rounded-md cursor-pointer bg-slate-200 hover:bg-blue-200"
             onClick={onClick}
         >
             <p className="font-semibold">{title}</p>
-            <p className="text-gray-800">{creators}</p>
+            <p className="text-gray-800">{newCreators}</p>
         </div>
     );
 }

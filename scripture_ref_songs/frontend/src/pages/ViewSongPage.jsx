@@ -80,7 +80,6 @@ export default function ViewSongPage() {
             <ScriptureReference
                 onClick={(ref) => {
                     let numRef = stringRefToNumRef(ref);
-                    console.log(numRef);
                     setSelectedPassage(numRef);
                 }}
                 onHover={(event, id) => {
@@ -168,7 +167,6 @@ export default function ViewSongPage() {
                 <ScriptureReference
                     onClick={(ref) => {
                         let numRef = stringRefToNumRef(ref);
-                        console.log(numRef);
                         setSelectedPassage(numRef);
                     }}
                     onHover={(event, id) => {}}
