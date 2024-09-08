@@ -24,7 +24,7 @@ def get_all_songs(request):
 
     query = Song.objects.all()
     for song in query:
-        songObj = { "title": song.name, "creators": song.creators }
+        songObj = { "id": song.id, "title": song.name, "creators": song.creators }
         songs["songs"].append(songObj)
 
     return JsonResponse(songs)
