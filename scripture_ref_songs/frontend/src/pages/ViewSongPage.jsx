@@ -222,7 +222,7 @@ function stringRefToNumRef(stringRef) {
 
     numRef.book = bookLookup[bookPart];
 
-    // handel number part
+    // handle number part
     let numberParts = numberPart.split(":");
 
     numRef.chapter = numberParts[0];
