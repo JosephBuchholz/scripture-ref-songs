@@ -1,5 +1,9 @@
 import { Link } from "react-router-dom";
+import SearchBar from "./SearchBar";
 
+/**
+ * A basic resuable header.
+ */
 export default function Header() {
     return <NavigationBar></NavigationBar>;
 }
@@ -15,6 +19,14 @@ function NavigationBar() {
                     >
                         SongReference
                     </Link>
+                </div>
+
+                <div className="flex justify-center items-center text-center">
+                    <SearchBar
+                        onSubmit={() => {
+                            console.log("Submited");
+                        }}
+                    ></SearchBar>
                 </div>
 
                 <ul className="flex justify-center items-center mr-8">

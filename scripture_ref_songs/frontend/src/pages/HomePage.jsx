@@ -1,5 +1,8 @@
 import Header from "../components/Header";
 
+/**
+ * Basic home page.
+ */
 export default function HomePage() {
     return (
         <>
@@ -7,7 +10,9 @@ export default function HomePage() {
                 <Header></Header>
 
                 <div className="flex-1 flex justify-center items-center">
-                    <h1 className="text-3xl font-bold text-blue-900">Hello!</h1>
+                    <h1 className="text-6xl font-bold text-blue-900">
+                        Welcome!
+                    </h1>
                 </div>
             </div>
         </>
