@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { bookLookup } from "../data";
 import LyricLine from "../components/LyricLine";
 import ScriptureReference from "../components/ScriptureReference";
+import BibleAPI from "../backend_apis/bible_api";
 
 /**
  * Pages that views the lyrics of a song/hymn.
@@ -31,22 +32,14 @@ export default function ViewSongPage() {
     if (selectedPassage !== null) {
         if (selectedPassage.verse.length === 1) {
             let verse = selectedPassage.verse[0];
-            fetch(
-                `/bible/getverse?b=${selectedPassage.book}&c=${selectedPassage.chapter}&v=${verse}`
-            ).then((response) => {
-                response.text().then((text) => {
-                    setBibleText(text);
-                });
+            BibleAPI.getVerse(selectedPassage.book, selectedPassage.chapter, verse).then((text) => {
+                setBibleText(text);
             });
         } else if (selectedPassage.verse.length === 2) {
             let verse1 = selectedPassage.verse[0];
             let verse2 = selectedPassage.verse[1];
-            fetch(
-                `/bible/getverserange?b=${selectedPassage.book}&c=${selectedPassage.chapter}&v1=${verse1}&v2=${verse2}`
-            ).then((response) => {
-                response.text().then((text) => {
-                    setBibleText(text);
-                });
+            BibleAPI.getVerseRange(selectedPassage.book, selectedPassage.chapter, verse1, verse2).then((text) => {
+                setBibleText(text);
             });
         }
     }
@@ -114,9 +107,7 @@ export default function ViewSongPage() {
                     </p>
                 );
             } else if (line === "Refrain:") {
-                lyricsDisplay.push(
-                    <LyricLine nonLyric={true}>{line}</LyricLine>
-                );
+                lyricsDisplay.push(<LyricLine nonLyric={true}>{line}</LyricLine>);
             }
 
             continue;
@@ -129,11 +120,7 @@ export default function ViewSongPage() {
 
             if (type === "l" && lineNumber === sp) {
                 highlight = true;
-            } else if (
-                type === "lr" &&
-                lineNumber >= sp[0] &&
-                lineNumber <= sp[1]
-            ) {
+            } else if (type === "lr" && lineNumber >= sp[0] && lineNumber <= sp[1]) {
                 highlight = true;
             }
         }
@@ -169,7 +156,7 @@ export default function ViewSongPage() {
                         let numRef = stringRefToNumRef(ref);
                         setSelectedPassage(numRef);
                     }}
-                    onHover={(event, id) => {}}
+                    onHover={() => {}}
                     id={index}
                 >
                     {ref}
@@ -189,15 +176,11 @@ export default function ViewSongPage() {
                 <div className="flex-1 flex flex-col justify-center items-center">
                     <div className="w-10/12 flex flex-row">
                         <div className="w-1/2">
-                            <div className="flex flex-row pb-5 h-12">
-                                {mainReferencesDisplay}
-                            </div>
+                            <div className="flex flex-row pb-5 h-12">{mainReferencesDisplay}</div>
                             <div className="flex flex-col">{lyricsDisplay}</div>
                         </div>
                         <div className="w-1/2 border-l-2 ml-4 pl-4">
-                            <div className="flex flex-wrap pb-5 h-12">
-                                {versesByLine}
-                            </div>
+                            <div className="flex flex-wrap pb-5 h-12">{versesByLine}</div>
                             <div className="flex flex-col">{bibleText}</div>
                         </div>
                     </div>

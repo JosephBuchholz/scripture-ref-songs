@@ -57,10 +57,7 @@ function SongListItem({ title, creators, onClick = () => {} }) {
     });
 
     return (
-        <div
-            className="m-2 p-4 rounded-md cursor-pointer bg-slate-200 hover:bg-blue-200"
-            onClick={onClick}
-        >
+        <div className="m-2 p-4 rounded-md cursor-pointer bg-slate-200 hover:bg-blue-200" onClick={onClick}>
             <p className="font-semibold">{title}</p>
             <p className="text-gray-800">{newCreators}</p>
         </div>
