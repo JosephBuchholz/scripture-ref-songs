@@ -17,4 +17,6 @@ jobs:
           cd scripture_ref_songs/frontend
           npm install
       - name: Build
-        run: npm run build
+        run: |
+          cd scripture_ref_songs/frontend
+          npm run build
