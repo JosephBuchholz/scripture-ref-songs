@@ -1,8 +1,6 @@
-name: Compile Docker Image
+name: Build
 
-on:
-  push:
-    branches: [release]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -22,10 +20,3 @@ jobs:
         run: |
           cd scripture_ref_songs/frontend
           npm run build
-      - name: Build and Push Docker Image to Docker Hub
-        uses: mr-smithers-excellent/docker-build-push@v4
-        with:
-          image: ${{ secrets.DOCKER_IMAGE }}
-          registry: docker.io
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
