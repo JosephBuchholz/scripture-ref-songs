@@ -27,3 +27,10 @@ Additionally, run `pip freeze > requirements.txt` in the main folder to add any 
 - If you make changes to the code and want to rebuild, just run:
   - `npm run build` in the `frontend` folder
   - And make sure the python server is running with: `python manage.py runserver` in the `scripture_ref_songs` folder
+
+# Docker
+
+- `docker run -p 8000:8000 -d <image-name>`
+- Run `docker logs --follow <container_id>` to view the logs
+- Run `docker stop <container_id>` to stop the server
+- Also, to build/rebuild a Docker image run `docker build -t <image-name> .`
