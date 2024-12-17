@@ -10,6 +10,18 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
+      - name: Set Up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+      - name: Install Dependencies
+        run: |
+          cd scripture_ref_songs/frontend
+          npm install
+      - name: Build
+        run: |
+          cd scripture_ref_songs/frontend
+          npm run build
       - name: Build and Push Docker Image to Docker Hub
         uses: mr-smithers-excellent/docker-build-push@v4
         with:
