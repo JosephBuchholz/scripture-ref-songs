@@ -13,7 +13,7 @@ jobs:
         with:
           node-version: "20.x"
       - name: Install Dependencies
-        run: cd scripture_ref_songs/frontend
-        run: npm install
+        - run: cd scripture_ref_songs/frontend
+        - run: npm install
       - name: Build
         run: npm run build
