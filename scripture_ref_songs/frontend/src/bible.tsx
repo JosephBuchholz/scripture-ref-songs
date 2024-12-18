@@ -1,13 +1,38 @@
 import React from "react";
 import BibleAPI from "./backend_apis/bible_api";
+import { bookLookup } from "./data";
 
-class BiblePassage {
-    book: number;
-    chapter: number;
-    verse: Array<number>;
+class BibleReference {
+    // Note: 1 indexed
+    book: number = 1;
+    chapter: number = 1;
+    verse: Array<Array<number>> = [];
 }
 
 export default class Bible {
+    static parseBibleReference(reference: string): BibleReference | null {
+        let newReference = new BibleReference();
+        var regex = /^([A-Za-z]+)\.?\s(\d+):((?:\d+[,-])*\d+)$/;
+        var matches = regex.exec(reference);
+
+        if (matches === null || matches.length !== 4) {
+            console.error("Not a valid Bible reference.");
+            return null;
+        }
+
+        newReference.book = bookLookup[matches[1]];
+        newReference.chapter = parseInt(matches[2]);
+
+        let verseSection = matches[3];
+        let verses = verseSection.split(",");
+        for (let verse of verses) {
+            let verseRange = verse.split("-");
+            newReference.verse.push(verseRange.map((value) => parseInt(value)));
+        }
+
+        return newReference;
+    }
+
     static parseBibleText(text: string): React.ReactElement {
         let newText = "";
 
@@ -45,20 +70,20 @@ export default class Bible {
         return <div className="inline-block">{elements}</div>;
     }
 
-    static getBiblePassage(selectedPassage: BiblePassage): Promise<React.ReactElement> {
-        console.log("getting a passage");
+    static getBiblePassage(selectedPassage: BibleReference): Promise<React.ReactElement> {
         return new Promise<React.ReactElement>((resolve, reject) => {
-            if (selectedPassage.verse.length === 1) {
-                let verse = selectedPassage.verse[0];
-                BibleAPI.getVerse(selectedPassage.book, selectedPassage.chapter, verse).then((text) => {
-                    resolve(this.parseBibleText(text));
-                });
-            } else if (selectedPassage.verse.length === 2) {
-                let verse1 = selectedPassage.verse[0];
-                let verse2 = selectedPassage.verse[1];
-                BibleAPI.getVerseRange(selectedPassage.book, selectedPassage.chapter, verse1, verse2).then((text) => {
-                    resolve(this.parseBibleText(text));
-                });
+            for (let verseRange of selectedPassage.verse) {
+                if (verseRange.length === 1) {
+                    BibleAPI.getVerse(selectedPassage.book, selectedPassage.chapter, verseRange[0]).then((text) => {
+                        resolve(this.parseBibleText(text));
+                    });
+                } else if (verseRange.length === 2) {
+                    BibleAPI.getVerseRange(selectedPassage.book, selectedPassage.chapter, verseRange[0], verseRange[1]).then((text) => {
+                        resolve(this.parseBibleText(text));
+                    });
+                }
+
+                break;
             }
         });
     }

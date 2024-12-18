@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom";
 import Header from "../components/Header";
 import { useEffect, useState } from "react";
-import { bookLookup } from "../data";
 import LyricLine from "../components/LyricLine";
 import ScriptureReference from "../components/ScriptureReference";
 import Bible from "../bible";
@@ -26,7 +25,7 @@ export default function ViewSongPage() {
                 });
             }
         });
-    }, []);
+    });
 
     useEffect(() => {
         // get selected Bible passage from backend
@@ -65,8 +64,7 @@ export default function ViewSongPage() {
         mainReferencesDisplay.push(
             <ScriptureReference
                 onClick={(ref) => {
-                    let numRef = stringRefToNumRef(ref);
-                    setSelectedPassage(numRef);
+                    setSelectedPassage(Bible.parseBibleReference(ref));
                 }}
                 onHover={(event, id) => {
                     if (event === 0) {
@@ -146,8 +144,7 @@ export default function ViewSongPage() {
             otherReferencesDisplay.push(
                 <ScriptureReference
                     onClick={(ref) => {
-                        let numRef = stringRefToNumRef(ref);
-                        setSelectedPassage(numRef);
+                        setSelectedPassage(Bible.parseBibleReference(ref));
                     }}
                     onHover={() => {}}
                     id={index}
@@ -180,37 +177,4 @@ export default function ViewSongPage() {
             </div>
         </>
     );
-}
-
-// TODO: will need updated
-function stringRefToNumRef(stringRef) {
-    let numRef = { book: 1, chapter: 1, verse: 1 };
-    let parts = stringRef.split(" ");
-
-    let bookPart = parts[0];
-    let numberPart = parts[1];
-
-    // slices off period if it is an abbrivation
-    if (bookPart.charAt(bookPart.length - 1) === ".") {
-        bookPart = bookPart.slice(0, -1);
-    }
-
-    numRef.book = bookLookup[bookPart];
-
-    // handle number part
-    let numberParts = numberPart.split(":");
-
-    numRef.chapter = numberParts[0];
-
-    let verseRange = numberParts[1];
-    let verses = verseRange.split("-");
-    if (verses.length === 1) {
-        // there was no verse range
-        numRef.verse = [verses[0]];
-    } else {
-        // there was a verse range
-        numRef.verse = verses;
-    }
-
-    return numRef;
 }
