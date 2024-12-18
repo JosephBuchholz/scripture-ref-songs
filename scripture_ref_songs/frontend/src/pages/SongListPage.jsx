@@ -1,6 +1,7 @@
 import Header from "../components/Header";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import SongAPI from "../backend_apis/song_api";
 
 /**
  * A page that shows a list of songs.
@@ -44,10 +45,7 @@ export default function SongListPage() {
 }
 
 function SongListItem({ title, creators, onClick = () => {} }) {
-    // split by ',' and ':'; then get only the odd indexs (thus only getting the names and not their roles)
-    let newCreators = creators.split(/:|,/).filter((_, index) => {
-        return index % 2 != 0; // is odd
-    });
+    let newCreators = SongAPI.parseArtistsList(creators).names;
 
     // add commas for seperators
     newCreators.forEach((_, index, array) => {

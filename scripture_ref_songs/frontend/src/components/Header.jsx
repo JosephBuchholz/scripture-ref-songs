@@ -14,7 +14,7 @@ function NavigationBar() {
             <div className="flex bg-gray-100 top-0 w-full h-16 justify-between z-50">
                 <div className="flex justify-center items-center text-center">
                     <Link to="/" className="text-3xl font-bold text-black m-6 p-1">
-                        SongReference
+                        Hymns
                     </Link>
                 </div>
 

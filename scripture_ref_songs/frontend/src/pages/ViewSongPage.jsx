@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import LyricLine from "../components/LyricLine";
 import ScriptureReference from "../components/ScriptureReference";
 import Bible from "../bible";
+import SongAPI from "../backend_apis/song_api";
 
 /**
  * Pages that views the lyrics of a song/hymn.
@@ -17,6 +18,9 @@ export default function ViewSongPage() {
     const [bibleText, setBibleText] = useState("");
     const [songData, setSongData] = useState(null);
 
+    const [title, setTitle] = useState(null);
+    const [artists, setArtists] = useState(null);
+
     useEffect(() => {
         fetch(`/songs/getfile?id=${id}`).then((response) => {
             if (response.ok) {
@@ -25,7 +29,22 @@ export default function ViewSongPage() {
                 });
             }
         });
-    });
+
+        SongAPI.getBasicSongData(id).then((data) => {
+            setTitle(data.title);
+
+            let names = data.artists.names;
+
+            // add commas for seperators
+            names.forEach((_, index, array) => {
+                if (index != names.length - 1) {
+                    array[index] += ", ";
+                }
+            });
+
+            setArtists(names);
+        });
+    }, [id]);
 
     useEffect(() => {
         // get selected Bible passage from backend
@@ -162,6 +181,11 @@ export default function ViewSongPage() {
         <>
             <div className="flex flex-col h-screen">
                 <Header></Header>
+
+                <div className="m-5">
+                    <h2 className="text-2xl font-semibold">{title}</h2>
+                    <h2 className="text-md">{artists}</h2>
+                </div>
 
                 <div className="flex-1 flex flex-col justify-center items-center">
                     <div className="w-10/12 grid grid-cols-2 m-5">

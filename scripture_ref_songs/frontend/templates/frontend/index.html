@@ -6,10 +6,10 @@
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width" />
 
-        <title>Scripture References</title>
+        <title>Hymns</title>
 
         {% load static %}
-        <link rel="shortcut icon" type="image/png" href="{% static "favicon.ico" %}"/>
+        <link rel="shortcut icon" type="image/png" href="{% static "icons/favicon.svg" %}"/>
         <link rel="stylesheet" type="text/css" href="{% static "frontend/index.css" %}">
     </head>
 
@@ -17,35 +17,5 @@
         <div id="app"></div>
 
         <script type="module" src="{% static "frontend/main.js" %}"></script>
-
-        <!--<script>
-            var refTagger = {
-                settings: {
-                    bibleReader: "bible.faithlife",
-                    bibleVersion: "KJV",			
-                    roundCorners: true,
-                    socialSharing: ["google"],
-                    customStyle : {
-                        heading: {
-                            backgroundColor : "#F5F5F5",
-                            color : "#000000"
-                        },
-                        body   : {
-                            color : "#000000",
-                            fontSize : "14px"
-                        }
-                    }
-                }
-            }; 
-
-            (function(d, t) {
-                var n = d.querySelector('[nonce]');
-                refTagger.settings.nonce = n && (n.nonce || n.getAttribute('nonce'));
-                var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
-                g.src = 'https://api.reftagger.com/v2/RefTagger.js';
-                g.nonce = refTagger.settings.nonce;
-                s.parentNode.insertBefore(g, s);
-            }(document, 'script'));
-        </script>-->
     </body>
 </html>
