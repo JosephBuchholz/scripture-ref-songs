@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { bookLookup } from "../data";
 import LyricLine from "../components/LyricLine";
 import ScriptureReference from "../components/ScriptureReference";
-import BibleAPI from "../backend_apis/bible_api";
+import Bible from "../bible";
 
 /**
  * Pages that views the lyrics of a song/hymn.
@@ -28,21 +28,14 @@ export default function ViewSongPage() {
         });
     }, []);
 
-    // get selected Bible passage from backend
-    if (selectedPassage !== null) {
-        if (selectedPassage.verse.length === 1) {
-            let verse = selectedPassage.verse[0];
-            BibleAPI.getVerse(selectedPassage.book, selectedPassage.chapter, verse).then((text) => {
-                setBibleText(text);
-            });
-        } else if (selectedPassage.verse.length === 2) {
-            let verse1 = selectedPassage.verse[0];
-            let verse2 = selectedPassage.verse[1];
-            BibleAPI.getVerseRange(selectedPassage.book, selectedPassage.chapter, verse1, verse2).then((text) => {
-                setBibleText(text);
+    useEffect(() => {
+        // get selected Bible passage from backend
+        if (selectedPassage !== null) {
+            Bible.getBiblePassage(selectedPassage).then((passage) => {
+                setBibleText(passage);
             });
         }
-    }
+    }, [selectedPassage]);
 
     /**
      * The first element is the type:
@@ -174,15 +167,14 @@ export default function ViewSongPage() {
                 <Header></Header>
 
                 <div className="flex-1 flex flex-col justify-center items-center">
-                    <div className="w-10/12 flex flex-row">
-                        <div className="w-1/2">
-                            <div className="flex flex-row pb-5 h-12">{mainReferencesDisplay}</div>
-                            <div className="flex flex-col">{lyricsDisplay}</div>
-                        </div>
-                        <div className="w-1/2 border-l-2 ml-4 pl-4">
-                            <div className="flex flex-wrap pb-5 h-12">{versesByLine}</div>
-                            <div className="flex flex-col">{bibleText}</div>
-                        </div>
+                    <div className="w-10/12 grid grid-cols-2 m-5">
+                        <div className="flex flex-wrap pb-5 p-4 border-r-2">{mainReferencesDisplay}</div>
+
+                        <div className="flex flex-wrap pb-5 p-4">{versesByLine}</div>
+
+                        <div className="flex flex-col p-4 border-r-2">{lyricsDisplay}</div>
+
+                        <div className="flex flex-col p-4">{bibleText}</div>
                     </div>
                 </div>
             </div>
