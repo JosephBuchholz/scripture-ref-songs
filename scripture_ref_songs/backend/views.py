@@ -18,6 +18,23 @@ def get_song_file(request):
 
     return HttpResponse(status=400)
 
+def get_song(request):
+    """
+    Gets an returns a song's basic data (title, author, etc.).
+    """
+
+    if request.GET:
+        id = request.GET.get("id")
+        try:
+            song = Song.objects.get(id=id)
+        except Song.DoesNotExist:
+            return HttpResponse(status=404)
+        
+        songObj = { "id": song.id, "title": song.name, "creators": song.creators }
+        return JsonResponse(songObj)
+
+    return HttpResponse(status=400)
+
 # gets and returns a list of songs from the database
 def get_all_songs(request):
     songs = { "songs": [] }

@@ -1,6 +1,7 @@
 import Header from "../components/Header";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import SongAPI from "../backend_apis/song_api";
 
 /**
  * A page that shows a list of songs.
@@ -44,22 +45,12 @@ export default function SongListPage() {
 }
 
 function SongListItem({ title, creators, onClick = () => {} }) {
-    // split by ',' and ':'; then get only the odd indexs (thus only getting the names and not their roles)
-    let newCreators = creators.split(/:|,/).filter((_, index) => {
-        return index % 2 != 0; // is odd
-    });
-
-    // add commas for seperators
-    newCreators.forEach((_, index, array) => {
-        if (index != newCreators.length - 1) {
-            array[index] += ", ";
-        }
-    });
+    let newCreators = SongAPI.parseArtistsList(creators).names;
 
     return (
         <div className="m-2 p-4 rounded-md cursor-pointer bg-slate-200 hover:bg-blue-200" onClick={onClick}>
             <p className="font-semibold">{title}</p>
-            <p className="text-gray-800">{newCreators}</p>
+            <p className="text-gray-800">{newCreators.join(", ")}</p>
         </div>
     );
 }

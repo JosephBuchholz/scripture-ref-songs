@@ -30,6 +30,5 @@ src/.vs
 
 # Other
 
-src/cpp/build
-
 venv
+scripture_ref_songs/frontend/static/frontend

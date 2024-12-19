@@ -18,7 +18,7 @@ export default function ScriptureReference({ children, onClick, onHover, id }) {
             onMouseLeave={() => {
                 onHover(1, id);
             }}
-            className="mx-1 font-semibold hover:text-blue-500 cursor-pointer"
+            className="mx-1 font-semibold hover:text-blue-500 cursor-pointer select-none"
         >
             {children}
         </p>

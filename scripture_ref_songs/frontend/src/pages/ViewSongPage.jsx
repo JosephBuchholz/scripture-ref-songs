@@ -1,10 +1,10 @@
 import { useParams } from "react-router-dom";
 import Header from "../components/Header";
 import { useEffect, useState } from "react";
-import { bookLookup } from "../data";
 import LyricLine from "../components/LyricLine";
 import ScriptureReference from "../components/ScriptureReference";
-import BibleAPI from "../backend_apis/bible_api";
+import Bible from "../bible";
+import SongAPI from "../backend_apis/song_api";
 
 /**
  * Pages that views the lyrics of a song/hymn.
@@ -18,6 +18,9 @@ export default function ViewSongPage() {
     const [bibleText, setBibleText] = useState("");
     const [songData, setSongData] = useState(null);
 
+    const [title, setTitle] = useState(null);
+    const [artists, setArtists] = useState(null);
+
     useEffect(() => {
         fetch(`/songs/getfile?id=${id}`).then((response) => {
             if (response.ok) {
@@ -26,23 +29,23 @@ export default function ViewSongPage() {
                 });
             }
         });
-    }, []);
 
-    // get selected Bible passage from backend
-    if (selectedPassage !== null) {
-        if (selectedPassage.verse.length === 1) {
-            let verse = selectedPassage.verse[0];
-            BibleAPI.getVerse(selectedPassage.book, selectedPassage.chapter, verse).then((text) => {
-                setBibleText(text);
-            });
-        } else if (selectedPassage.verse.length === 2) {
-            let verse1 = selectedPassage.verse[0];
-            let verse2 = selectedPassage.verse[1];
-            BibleAPI.getVerseRange(selectedPassage.book, selectedPassage.chapter, verse1, verse2).then((text) => {
-                setBibleText(text);
+        SongAPI.getBasicSongData(id).then((data) => {
+            setTitle(data.title);
+
+            let names = data.artists.names;
+            setArtists(names.join(", "));
+        });
+    }, [id]);
+
+    useEffect(() => {
+        // get selected Bible passage from backend
+        if (selectedPassage !== null) {
+            Bible.getBiblePassageWithSelection(selectedPassage).then((passage) => {
+                setBibleText(passage);
             });
         }
-    }
+    }, [selectedPassage]);
 
     /**
      * The first element is the type:
@@ -72,8 +75,7 @@ export default function ViewSongPage() {
         mainReferencesDisplay.push(
             <ScriptureReference
                 onClick={(ref) => {
-                    let numRef = stringRefToNumRef(ref);
-                    setSelectedPassage(numRef);
+                    setSelectedPassage(Bible.parseBibleReference(ref));
                 }}
                 onHover={(event, id) => {
                     if (event === 0) {
@@ -153,8 +155,7 @@ export default function ViewSongPage() {
             otherReferencesDisplay.push(
                 <ScriptureReference
                     onClick={(ref) => {
-                        let numRef = stringRefToNumRef(ref);
-                        setSelectedPassage(numRef);
+                        setSelectedPassage(Bible.parseBibleReference(ref));
                     }}
                     onHover={() => {}}
                     id={index}
@@ -173,52 +174,23 @@ export default function ViewSongPage() {
             <div className="flex flex-col h-screen">
                 <Header></Header>
 
-                <div className="flex-1 flex flex-col justify-center items-center">
-                    <div className="w-10/12 flex flex-row">
-                        <div className="w-1/2">
-                            <div className="flex flex-row pb-5 h-12">{mainReferencesDisplay}</div>
-                            <div className="flex flex-col">{lyricsDisplay}</div>
-                        </div>
-                        <div className="w-1/2 border-l-2 ml-4 pl-4">
-                            <div className="flex flex-wrap pb-5 h-12">{versesByLine}</div>
-                            <div className="flex flex-col">{bibleText}</div>
-                        </div>
+                <div className="m-5">
+                    <h2 className="text-2xl font-semibold">{title}</h2>
+                    <h2 className="text-md">{artists}</h2>
+                </div>
+
+                <div className="flex-1 flex flex-col items-center overflow-y-hidden">
+                    <div className="lg:w-10/12 w-full grid grid-cols-2 mx-5 h-full content-start">
+                        <div className="flex flex-wrap pb-5 p-4 border-r-2 content-start">{mainReferencesDisplay}</div>
+
+                        <div className="flex flex-wrap pb-5 p-4 content-start">{versesByLine}</div>
+
+                        <div className="flex flex-col p-4 border-r-2 overflow-y-scroll">{lyricsDisplay}</div>
+
+                        <div className="flex flex-col p-4 overflow-y-scroll">{bibleText}</div>
                     </div>
                 </div>
             </div>
         </>
     );
-}
-
-// TODO: will need updated
-function stringRefToNumRef(stringRef) {
-    let numRef = { book: 1, chapter: 1, verse: 1 };
-    let parts = stringRef.split(" ");
-
-    let bookPart = parts[0];
-    let numberPart = parts[1];
-
-    // slices off period if it is an abbrivation
-    if (bookPart.charAt(bookPart.length - 1) === ".") {
-        bookPart = bookPart.slice(0, -1);
-    }
-
-    numRef.book = bookLookup[bookPart];
-
-    // handle number part
-    let numberParts = numberPart.split(":");
-
-    numRef.chapter = numberParts[0];
-
-    let verseRange = numberParts[1];
-    let verses = verseRange.split("-");
-    if (verses.length === 1) {
-        // there was no verse range
-        numRef.verse = [verses[0]];
-    } else {
-        // there was a verse range
-        numRef.verse = verses;
-    }
-
-    return numRef;
 }
