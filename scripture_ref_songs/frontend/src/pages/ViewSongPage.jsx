@@ -34,15 +34,7 @@ export default function ViewSongPage() {
             setTitle(data.title);
 
             let names = data.artists.names;
-
-            // add commas for seperators
-            names.forEach((_, index, array) => {
-                if (index != names.length - 1) {
-                    array[index] += ", ";
-                }
-            });
-
-            setArtists(names);
+            setArtists(names.join(", "));
         });
     }, [id]);
 
@@ -187,15 +179,15 @@ export default function ViewSongPage() {
                     <h2 className="text-md">{artists}</h2>
                 </div>
 
-                <div className="flex-1 flex flex-col justify-center items-center">
-                    <div className="w-10/12 grid grid-cols-2 m-5">
-                        <div className="flex flex-wrap pb-5 p-4 border-r-2">{mainReferencesDisplay}</div>
+                <div className="flex-1 flex flex-col items-center overflow-y-hidden">
+                    <div className="lg:w-10/12 w-full grid grid-cols-2 mx-5 h-full content-start">
+                        <div className="flex flex-wrap pb-5 p-4 border-r-2 content-start">{mainReferencesDisplay}</div>
 
-                        <div className="flex flex-wrap pb-5 p-4">{versesByLine}</div>
+                        <div className="flex flex-wrap pb-5 p-4 content-start">{versesByLine}</div>
 
-                        <div className="flex flex-col p-4 border-r-2">{lyricsDisplay}</div>
+                        <div className="flex flex-col p-4 border-r-2 overflow-y-scroll">{lyricsDisplay}</div>
 
-                        <div className="flex flex-col p-4">{bibleText}</div>
+                        <div className="flex flex-col p-4 overflow-y-scroll">{bibleText}</div>
                     </div>
                 </div>
             </div>
