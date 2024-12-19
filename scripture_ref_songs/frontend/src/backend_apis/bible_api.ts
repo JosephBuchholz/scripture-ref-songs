@@ -13,10 +13,37 @@ export default class BibleAPI {
 
     static getVerseRange(book: number, chapter: number, verseBegin: number, verseEnd: number): Promise<string> {
         return new Promise((resolve) => {
-            fetch(`${bibleAPI_URL}/getverserange?b=${book}&c=${chapter}&v1=${verseBegin}&v2=${verseEnd}`).then((response) => {
-                response.text().then((text) => {
-                    resolve(text);
-                });
+            fetch(`${bibleAPI_URL}/getverserange?b=${book}&c=${chapter}&v1=${verseBegin}&v2=${verseEnd}&verseNumbers=true`).then(
+                (response) => {
+                    response.text().then((text) => {
+                        resolve(text);
+                    });
+                }
+            );
+        });
+    }
+
+    static getChapterText(book: number, chapter: number): Promise<string> {
+        return new Promise((resolve) => {
+            fetch(`${bibleAPI_URL}/getchapter?b=${book}&c=${chapter}&verseNumbers=true&concatenate=true`).then((response) => {
+                if (response.ok) {
+                    response.text().then((text) => {
+                        resolve(text);
+                    });
+                }
+            });
+        });
+    }
+
+    static getChapter(book: number, chapter: number): Promise<{ verses: Array<string> }> {
+        return new Promise((resolve) => {
+            fetch(`${bibleAPI_URL}/getchapter?b=${book}&c=${chapter}&verseNumbers=true&concatenate=false`).then((response) => {
+                if (response.ok) {
+                    response.json().then((json) => {
+                        console.log(json);
+                        resolve({ verses: json.verses });
+                    });
+                }
             });
         });
     }

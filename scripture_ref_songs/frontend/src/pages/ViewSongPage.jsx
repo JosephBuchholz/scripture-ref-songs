@@ -49,7 +49,7 @@ export default function ViewSongPage() {
     useEffect(() => {
         // get selected Bible passage from backend
         if (selectedPassage !== null) {
-            Bible.getBiblePassage(selectedPassage).then((passage) => {
+            Bible.getBiblePassageWithSelection(selectedPassage).then((passage) => {
                 setBibleText(passage);
             });
         }

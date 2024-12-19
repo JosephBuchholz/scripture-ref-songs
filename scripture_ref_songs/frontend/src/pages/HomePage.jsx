@@ -6,13 +6,11 @@ import Header from "../components/Header";
 export default function HomePage() {
     return (
         <>
-            <div className="flex flex-col h-screen">
+            <div className="flex flex-col h-full">
                 <Header></Header>
 
                 <div className="flex-1 flex justify-center items-center">
-                    <h1 className="text-6xl font-bold text-blue-900">
-                        Welcome!
-                    </h1>
+                    <h1 className="text-6xl font-bold text-blue-900">Welcome!</h1>
                 </div>
             </div>
         </>
